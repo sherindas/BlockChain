@@ -1,30 +1,33 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity 0.8.26;
 
-contract CrowdFunding 
-{    
-    address payable public benificiary;
+contract Crowdfunding {
+    
+    address payable public beneficiary;
     uint256 public goal;
-    uint256 deadline;
-    uint256 public raiseamount;
-    mapping (address => uint256) public contribution;
-    constructor (address payable _benificiary,uint256 _goal,uint256 _deadline)
-    {
-        benificiary = _benificiary;
-        goal  = _goal;
-        deadline = block.timestamp + _deadline *1 days;
-    }
-        function contribute()public payable {
-       //require(block.timestamp <= deadline,"Campagign has already Ended");
-       require(msg.value > 0, "Contribution must be Greater than 0");
-       contribution[msg.sender] += msg.value;
-       raiseamount += msg.value;
-        }
+    uint256 public deadline;
+    uint256 public raisedAmount;
+    mapping (address => uint256) public contributions;
 
-        function withdraw() public {
-            require(block.timestamp > deadline," Campagin has not ended");
-            require(raiseamount >= goal,"Goal not reached");
-            require(msg.sender == benificiary,"Only beneficiary can claim");
-            payable(benificiary).transfer(raiseamount);
-        }
+    constructor(address payable _beneficiary,uint256 _goal, uint256 _deadline)
+    {
+        beneficiary = _beneficiary;
+        goal = _goal;
+        deadline = _deadline;
+    }
+
+    function contribute() public payable {
+        // require(block.timestamp<= deadline,"Campaign is Ended");
+        require(msg.value > 0,"Contribution must be greater than 0");
+
+        contributions[msg.sender] += msg.value;
+        raisedAmount += msg.value;
+    }
+
+    function withdraw() public {
+        require(block.timestamp > deadline,"Campaign has not ended");
+        require(raisedAmount >= goal, "Goal not reached");
+        require(msg.sender == beneficiary,"Only beneficiary can claim");
+        payable(beneficiary).transfer(raisedAmount);
+    }
 }

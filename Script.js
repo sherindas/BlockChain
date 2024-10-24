@@ -1,13 +1,16 @@
-const provider = new ethers.providers.Web3Provider(window.ethereum);
-const signer = provider.getSigner(); // Corrected method name
 
-const contractAddress = "0x1110cf61fd3d65b0a01bc2c80219c4a071e22a6916a91e210fe6ecc576bc9afd";
+const provider = new ethers.providers.Web3Provider(window.ethereum);
+const signer = provider.getSigner();
+
+// Add your own contract address which you deployed on XDC
+const contractAddress = "0x1435DB735c95D4EB44e421914EAdF0742250BeC2";
+
 const contractABI = [
     {
         "inputs": [
             {
                 "internalType": "address payable",
-                "name": "_benificiary", // Note: correct spelling should be "beneficiary"
+                "name": "_benificiary",
                 "type": "address"
             },
             {
@@ -26,7 +29,7 @@ const contractABI = [
     },
     {
         "inputs": [],
-        "name": "beneficiary", // Corrected spelling
+        "name": "benificiary",
         "outputs": [
             {
                 "internalType": "address payable",
@@ -99,33 +102,53 @@ const contractABI = [
 ];
 
 const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
 const connectButton = document.getElementById('connect-button');
 const contributionForm = document.getElementById('contribution-form');
-const amountInput = document.getElementById("contribution-amount"); // Corrected to match expected ID
-const statusDive = document.getElementById('status');
+const amountInput = document.getElementById('amount');
+const contributeButton = document.getElementById('contribute-button');
+const withdrawButton = document.getElementById("withdraw-button");
+const statusDiv = document.getElementById('status');
 
 if (connectButton) {
     connectButton.addEventListener("click", async () => {
         try {
             await provider.send("eth_requestAccounts", []);
             const accounts = await signer.getAddress();
-            statusDive.textContent = "Connected to: " + accounts;
+            console.log(accounts);
+            statusDiv.textContent = "Connected to: " + accounts;
         } catch (error) {
-            console.error(error);
+            console.error("Connection error:", error);
+            statusDiv.textContent = "Connection Failed: " + error.message;
         }
     });
 }
 
-if (contributionForm) { // Change this to `contributionForm`
-    contributionForm.addEventListener("submit", async (event) => {
-        event.preventDefault(); // Prevent form submission
+if (contributeButton) {
+    contributeButton.addEventListener("click", async () => {
         try {
             const amount = ethers.utils.parseEther(amountInput.value);
-            const tx = await contract.contribute({ value: amount }); // Fixed the object syntax
-            await tx.wait(); // Fixed typo from `t2` to `tx`
-            statusDive.textContent = "Contribution successful!";
+            const tx = await contract.contribute({ value: amount });
+            await tx.wait();
+            statusDiv.textContent = "Contribution Successful!";
         } catch (error) {
-            console.error(error);
+            console.error("Contribution error:", error);
+            statusDiv.textContent = "Contribution Failed: " + error.message;
         }
     });
 }
+
+if (withdrawButton) {
+    withdrawButton.addEventListener("click", async () => {
+        try {
+            const tx = await contract.withdraw();
+            await tx.wait();
+            statusDiv.textContent = "Withdrawal Successful!";
+        } catch (error) {
+            console.error("Withdrawal error:", error);
+            statusDiv.textContent = "Withdrawal Failed: " + error.message;
+        }
+    });
+}
+
+
