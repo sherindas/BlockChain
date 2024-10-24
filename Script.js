@@ -136,7 +136,7 @@ if (contributeButton) {
             statusDiv.textContent = "Contribution Failed: " + error.message;
         }
     });
-}
+}gi 
 
 if (withdrawButton) {
     withdrawButton.addEventListener("click", async () => {
@@ -150,5 +150,8 @@ if (withdrawButton) {
         }
     });
 }
+
+if (goal)
+
 
 
